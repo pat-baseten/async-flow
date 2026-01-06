@@ -67,7 +67,9 @@ export class Controls {
     // Replica controls (increased max to 10 for realistic scenarios)
     const { slider, valueEl } = this.addSlider('Replicas', 0, 10, this.simulation.getTargetReplicas(), 1, (value) => {
       this.simulation.setTargetReplicas(value);
-    }, '', undefined, 'Number of model replicas to run. Set to 0 to test scale-from-zero.');
+      // Also set minReplicas so autoscaling won't scale below the manual setting
+      this.simulation.setConfig({ minReplicas: value });
+    }, '', undefined, 'Minimum replicas to keep running. Set to 0 for scale-to-zero.');
     this.replicaSlider = slider;
     this.replicaValueEl = valueEl;
 

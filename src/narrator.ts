@@ -268,6 +268,7 @@ export class Narrator {
   private renderIdleState(replicaCount: number): void {
     const state = this.simulation.getState();
     const scaleDownDelaySec = Math.round(state.config.scaleDownDelayMs / 1000);
+    const minReplicas = state.config.minReplicas;
 
     const narration = this.template(`
       <div class="narration-empty">
@@ -278,8 +279,15 @@ export class Narrator {
       ${replicaCount > 0 ? this.template(`
         <div class="narration-step" style="margin-top: 8px; opacity: 0.7;">
           <span class="narration-step-icon">📉</span>
-          Replicas will <span class="highlight">scale down</span> after ${scaleDownDelaySec}s of inactivity
-          (scale_down_delay: ${scaleDownDelaySec}s)
+          ${minReplicas > 0
+            ? `Autoscaling won't go below <span class="highlight">${minReplicas}</span> replica${minReplicas > 1 ? 's' : ''} (min_replicas: ${minReplicas})`
+            : `Replicas will <span class="highlight">scale to zero</span> after ${scaleDownDelaySec}s of inactivity`}
+        </div>
+      `) : ''}
+      ${replicaCount === 0 && minReplicas === 0 ? this.template(`
+        <div class="narration-step" style="margin-top: 8px; opacity: 0.7;">
+          <span class="narration-step-icon">💡</span>
+          Set the Replicas slider above 0 to keep replicas always on.
         </div>
       `) : ''}
     `);
