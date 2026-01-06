@@ -1,0 +1,17 @@
+{
+  "name": "async-flow-visualization",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "esbuild src/index.ts --bundle --outfile=out/index.js --format=esm --watch",
+    "build": "esbuild src/index.ts --bundle --outfile=out/index.js --format=esm --minify",
+    "serve": "npx serve ."
+  },
+  "dependencies": {
+    "pixi.js": "^8.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.2",
+    "typescript": "^5.0.0"
+  }
+}
