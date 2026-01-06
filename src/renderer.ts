@@ -31,6 +31,7 @@ const COLORS = {
 
   // Replica states (matching CSS variables)
   replica_stopped: 0x1a1a2e,    // --bg-tertiary
+  replica_stopping: 0x64748b,   // Gray - shutting down
   replica_starting: 0xfb923c,   // --replica-starting
   replica_ready: 0x4ecdc4,      // --replica-ready
   replica_busy: 0xfbbf24,       // --replica-busy
@@ -288,6 +289,7 @@ export class Renderer {
    * Positions are based on sorted replica IDs for stability
    */
   private renderReplicas(replicas: Replica[]): void {
+    // Include 'stopping' replicas so they can animate out
     const activeReplicas = replicas.filter((r) => r.state !== 'stopped');
     const currentIds = new Set(activeReplicas.map((r) => r.id));
 
@@ -375,19 +377,38 @@ export class Renderer {
     // Update box color
     const box = sprite.children[0] as PIXI.Graphics;
     const color = this.getReplicaColor(replica.state);
+
+    // Calculate alpha based on state
+    let alpha = 0.3;
+    if (replica.state === 'stopping' && replica.stoppingAt) {
+      const state = this.simulation.getState();
+      const stoppingTime = state.tick - replica.stoppingAt;
+      const progress = Math.min(stoppingTime / 1000, 1); // 1 second fade
+      alpha = 0.3 * (1 - progress);
+    }
+
     box.clear()
       .roundRect(-35, -20, 70, 40, 6)
-      .fill({ color, alpha: 0.3 })
-      .stroke({ color, width: 2 });
+      .fill({ color, alpha })
+      .stroke({ color, width: 2, alpha: replica.state === 'stopping' ? (1 - alpha / 0.3) * 0.5 + 0.5 : 1 });
 
     // Update label
     const label = sprite.children[1] as PIXI.Text;
     label.text = this.getReplicaLabel(replica.state);
+    label.alpha = replica.state === 'stopping' ? (alpha / 0.3) : 1;
 
-    // Pulsing animation for starting replicas
+    // Animation based on state
     if (replica.state === 'starting') {
+      // Pulsing animation for starting replicas
       const pulse = 1 + Math.sin(Date.now() * 0.005) * 0.1;
       sprite.scale.set(pulse);
+    } else if (replica.state === 'stopping' && replica.stoppingAt) {
+      // Shrink animation for stopping replicas
+      const state = this.simulation.getState();
+      const stoppingTime = state.tick - replica.stoppingAt;
+      const progress = Math.min(stoppingTime / 1000, 1);
+      const shrink = 1 - progress * 0.3; // Shrink to 70%
+      sprite.scale.set(shrink);
     } else {
       sprite.scale.set(1);
     }
@@ -400,6 +421,8 @@ export class Renderer {
     switch (state) {
       case 'stopped':
         return COLORS.replica_stopped;
+      case 'stopping':
+        return COLORS.replica_stopping;
       case 'starting':
         return COLORS.replica_starting;
       case 'ready':
@@ -418,6 +441,8 @@ export class Renderer {
     switch (state) {
       case 'stopped':
         return 'Stopped';
+      case 'stopping':
+        return 'Stopping...';
       case 'starting':
         return 'Starting...';
       case 'ready':

@@ -43,12 +43,13 @@ export interface Request {
 /**
  * State of a model replica
  */
-export type ReplicaState = 'stopped' | 'starting' | 'ready' | 'busy';
+export type ReplicaState = 'stopped' | 'stopping' | 'starting' | 'ready' | 'busy';
 
 export interface Replica {
   id: number;
   state: ReplicaState;
   startingAt?: number;
+  stoppingAt?: number;  // When the replica started stopping (for animation)
   currentRequestIds: string[];  // Supports concurrent requests per replica
 }
 

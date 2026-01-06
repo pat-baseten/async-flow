@@ -294,6 +294,16 @@ export class Simulation {
         console.log(`[replica] Replica ${replica.id} is now ready`);
       }
     }
+
+    // Handle stopping animation (1 second fade out)
+    if (replica.state === 'stopping' && replica.stoppingAt) {
+      const stoppingTime = this.state.tick - replica.stoppingAt;
+      if (stoppingTime >= 1000) {
+        replica.state = 'stopped';
+        replica.stoppingAt = undefined;
+        console.log(`[replica] Replica ${replica.id} has stopped`);
+      }
+    }
   }
 
   /**
@@ -489,15 +499,19 @@ export class Simulation {
 
     // Scale down (only stop ready replicas with no active requests)
     while (activeReplicas.length > this.state.targetReplicas) {
+      // Find a ready replica that's not already stopping
       const readyReplica = this.state.replicas.find(
         (r) => r.state === 'ready' && r.currentRequestIds.length === 0
       );
 
       if (readyReplica) {
-        readyReplica.state = 'stopped';
+        // Start the stopping animation
+        readyReplica.state = 'stopping';
+        readyReplica.stoppingAt = this.state.tick;
         readyReplica.startingAt = undefined;
         readyReplica.currentRequestIds = [];
         activeReplicas.splice(activeReplicas.indexOf(readyReplica), 1);
+        console.log(`[replica] Replica ${readyReplica.id} is stopping`);
       } else {
         break; // Don't stop busy or starting replicas, or replicas with active requests
       }
