@@ -80,6 +80,21 @@ The simulation uses Baseten-accurate defaults that match actual infrastructure b
 
 All parameters can be adjusted via the interactive controls in the UI.
 
+## Deployment
+
+### Vercel
+
+This project is configured for easy deployment on Vercel:
+
+1. Push your code to GitHub
+2. Import the repository in [Vercel](https://vercel.com)
+3. Vercel will auto-detect the settings from `vercel.json`:
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `.` (root)
+   - **Install Command**: `npm install`
+
+The `vercel.json` configuration file ensures the build runs correctly and serves the static files from the root directory.
+
 ## Technologies
 
 - **TypeScript**: Type-safe development

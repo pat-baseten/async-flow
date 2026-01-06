@@ -265,6 +265,55 @@
       text-align: right;
     }
 
+    /* Tooltips */
+    .has-tooltip {
+      position: relative;
+    }
+
+    .has-tooltip .tooltip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-size: 0.6875rem;
+      font-weight: 400;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s, visibility 0.15s;
+      pointer-events: none;
+      z-index: 100;
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-md);
+      max-width: 250px;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .has-tooltip .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--bg-elevated);
+    }
+
+    .has-tooltip:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    button.has-tooltip .tooltip {
+      bottom: calc(100% + 4px);
+    }
+
     .separator {
       width: 1px;
       height: 28px;
@@ -511,149 +560,6 @@
       padding: var(--space-xl) var(--space-md);
     }
 
-    /* Info box */
-    .info {
-      margin-top: var(--space-xl);
-      padding: var(--space-md) var(--space-lg);
-      background: var(--accent-primary-dim);
-      border: 1px solid rgba(78, 205, 196, 0.2);
-      border-radius: var(--radius-md);
-      max-width: 640px;
-      width: 100%;
-      font-size: 0.8125rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    .info strong {
-      color: var(--accent-primary);
-      font-weight: 600;
-    }
-
-    .info em {
-      display: block;
-      margin-top: var(--space-sm);
-      padding-top: var(--space-sm);
-      border-top: 1px solid var(--border-subtle);
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
-    }
-
-    /* Settings panel */
-    .settings-panel {
-      margin-top: var(--space-lg);
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      max-width: 640px;
-      width: 100%;
-      overflow: hidden;
-      border: 1px solid var(--border-subtle);
-    }
-
-    .settings-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-md);
-      background: var(--bg-tertiary);
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-
-    .settings-header:hover {
-      background: var(--bg-elevated);
-    }
-
-    .settings-header span {
-      font-size: 0.8125rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-    }
-
-    .settings-header span::before {
-      content: '⚙️';
-      font-size: 0.875rem;
-    }
-
-    .settings-toggle {
-      background: var(--bg-primary);
-      border: 1px solid var(--border-default);
-      color: var(--text-secondary);
-      width: 24px;
-      height: 24px;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.625rem;
-      padding: 0;
-    }
-
-    .settings-toggle:hover {
-      background: var(--bg-elevated);
-      transform: none;
-      box-shadow: none;
-    }
-
-    .settings-content {
-      padding: var(--space-md);
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .settings-section {
-      margin-bottom: var(--space-md);
-    }
-
-    .settings-section:last-child {
-      margin-bottom: 0;
-    }
-
-    .settings-section h4 {
-      font-size: 0.6875rem;
-      font-weight: 600;
-      color: var(--text-tertiary);
-      margin-bottom: var(--space-sm);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .settings-section pre {
-      font-family: 'JetBrains Mono', monospace;
-      background: var(--bg-primary);
-      padding: var(--space-md);
-      border-radius: var(--radius-sm);
-      font-size: 0.6875rem;
-      color: var(--text-secondary);
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-break: break-all;
-      margin-bottom: var(--space-sm);
-      border: 1px solid var(--border-subtle);
-      line-height: 1.6;
-    }
-
-    .copy-btn {
-      font-size: 0.6875rem;
-      padding: var(--space-xs) var(--space-sm);
-      background: var(--bg-elevated);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-default);
-    }
-
-    .copy-btn:hover {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-    }
-
-    .copy-btn.copied {
-      background: var(--accent-primary);
-      border-color: var(--accent-primary);
-      color: var(--bg-primary);
-    }
-
     /* Responsive */
     @media (max-width: 1100px) {
       .app-container {
@@ -701,7 +607,7 @@
   <header class="header">
     <h1>Inference <span>Request Flow</span></h1>
     <p class="subtitle">
-      Interactive visualization of async and sync requests through Baseten's infrastructure.
+      Interactive visualization of async requests through Baseten's infrastructure.
       Watch autoscaling, queueing, and request processing in real-time.
     </p>
   </header>
@@ -792,35 +698,6 @@
       <div class="narration-header">Live Status</div>
       <div class="narration-content" id="narration-content">
         <div class="narration-empty">Send a request to see how it flows through the system.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="info">
-    <strong>Try this:</strong> Scale up to 3 replicas, then send a burst of requests. Watch how
-    <strong>round-robin load balancing</strong> distributes requests evenly across all ready replicas.
-    Or start at 0 replicas and send a request to see the cold-start delay before processing begins.
-    <em>
-      Demo uses shortened timings (15s scale-down vs real 15min, 5s autoscale window vs real 60s).
-      Export Settings below shows real Baseten defaults.
-    </em>
-  </div>
-
-  <div class="settings-panel" id="settings-panel">
-    <div class="settings-header">
-      <span>Export Settings</span>
-      <button class="settings-toggle" id="settings-toggle">▼</button>
-    </div>
-    <div class="settings-content" id="settings-content" style="display: none;">
-      <div class="settings-section">
-        <h4>config.yaml (Truss)</h4>
-        <pre id="config-yaml"></pre>
-        <button class="copy-btn" data-target="config-yaml">Copy</button>
-      </div>
-      <div class="settings-section">
-        <h4>Autoscaling API (curl)</h4>
-        <pre id="autoscaling-curl"></pre>
-        <button class="copy-btn" data-target="autoscaling-curl">Copy</button>
       </div>
     </div>
   </div>

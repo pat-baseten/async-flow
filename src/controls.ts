@@ -21,20 +21,20 @@ export class Controls {
     // Request buttons
     this.addButton('Send Request', () => {
       this.simulation.addRequest(1);
-    });
+    }, 'primary', 'Send a single async request to the queue');
 
     this.addButton('Send Burst (5)', () => {
       this.simulation.addBurst(5, 1);
-    }, 'secondary');
+    }, 'secondary', 'Send 5 requests in quick succession');
 
     // Priority buttons (async queue supports priority)
     this.addButton('High Priority', () => {
       this.simulation.addRequest(0);
-    }, 'danger');
+    }, 'danger', 'High priority requests are processed first');
 
     this.addButton('Low Priority', () => {
       this.simulation.addRequest(2);
-    }, 'secondary');
+    }, 'secondary', 'Low priority requests wait for higher priority ones');
 
     // Simulation controls
     this.pauseButton = this.addButton('Pause', () => {
@@ -67,14 +67,14 @@ export class Controls {
     // Replica controls (increased max to 10 for realistic scenarios)
     const { slider, valueEl } = this.addSlider('Replicas', 0, 10, this.simulation.getTargetReplicas(), 1, (value) => {
       this.simulation.setTargetReplicas(value);
-    }, '');
+    }, '', undefined, 'Number of model replicas to run. Set to 0 to test scale-from-zero.');
     this.replicaSlider = slider;
     this.replicaValueEl = valueEl;
 
     // Speed control
     this.addSlider('Speed', 0.25, 4, this.simulation.getSpeed(), 0.25, (value) => {
       this.simulation.setSpeed(value);
-    }, 'x', 'speed');
+    }, 'x', 'speed', 'Simulation speed multiplier');
 
     // Separator
     this.addSeparator();
@@ -82,27 +82,27 @@ export class Controls {
     // Model processing time (increased max for long-running models like LLMs)
     this.addSlider('Model Time', 500, 30000, config.modelProcessingTimeMs, 500, (value) => {
       this.simulation.setConfig({ modelProcessingTimeMs: value });
-    }, 'ms', 'modelProcessingTimeMs');
+    }, 'ms', 'modelProcessingTimeMs', 'Time for the model to process each request. LLMs typically take 2-30 seconds.');
 
     // Cold start time (increased for large models)
     this.addSlider('Cold Start', 1000, 60000, config.coldStartTimeMs, 1000, (value) => {
       this.simulation.setConfig({ coldStartTimeMs: value });
-    }, 'ms', 'coldStartTimeMs');
+    }, 'ms', 'coldStartTimeMs', 'Time to start a new replica from stopped state. Larger models take longer.');
 
     // Queue timeout
     this.addSlider('Queue TTL', 2000, 30000, config.maxTimeInQueueMs, 1000, (value) => {
       this.simulation.setConfig({ maxTimeInQueueMs: value });
-    }, 'ms', 'maxTimeInQueueMs');
+    }, 'ms', 'maxTimeInQueueMs', 'Maximum time a request can wait in the queue before expiring.');
 
     // Concurrency target (triggers autoscaling)
     this.addSlider('Concurrency', 1, 5, config.concurrencyTarget, 1, (value) => {
       this.simulation.setConfig({ concurrencyTarget: value });
-    }, ' req/replica', 'concurrencyTarget');
+    }, ' req/replica', 'concurrencyTarget', 'Concurrent requests per replica. Autoscaling triggers when this is exceeded.');
 
     // Scale down delay (demo values, shorter than real defaults for visualization)
     this.addSlider('Scale Down', 5000, 60000, config.scaleDownDelayMs, 5000, (value) => {
       this.simulation.setConfig({ scaleDownDelayMs: value });
-    }, 'ms', 'scaleDownDelayMs');
+    }, 'ms', 'scaleDownDelayMs', 'Time to wait before scaling down idle replicas. Real default is 15 minutes.');
 
     // Update replica slider display periodically
     setInterval(() => this.updateReplicaDisplay(), 200);
@@ -112,12 +112,20 @@ export class Controls {
   private addButton(
     label: string,
     onClick: () => void,
-    style: 'primary' | 'secondary' | 'danger' = 'primary'
+    style: 'primary' | 'secondary' | 'danger' = 'primary',
+    tooltip?: string
   ): HTMLButtonElement {
     const btn = document.createElement('button');
     btn.textContent = label;
     if (style !== 'primary') {
       btn.className = style;
+    }
+    if (tooltip) {
+      btn.classList.add('has-tooltip');
+      const tooltipEl = document.createElement('span');
+      tooltipEl.className = 'tooltip';
+      tooltipEl.textContent = tooltip;
+      btn.appendChild(tooltipEl);
     }
     btn.addEventListener('click', onClick);
     this.container.appendChild(btn);
@@ -142,10 +150,18 @@ export class Controls {
     step: number,
     onChange: (value: number) => void,
     unit: string = '',
-    configKey?: string
+    configKey?: string,
+    tooltip?: string
   ): { slider: HTMLInputElement; valueEl: HTMLSpanElement; group: HTMLDivElement } {
     const group = document.createElement('div');
     group.className = 'control-group';
+    if (tooltip) {
+      group.classList.add('has-tooltip');
+      const tooltipEl = document.createElement('span');
+      tooltipEl.className = 'tooltip';
+      tooltipEl.textContent = tooltip;
+      group.appendChild(tooltipEl);
+    }
 
     const labelEl = document.createElement('label');
     labelEl.textContent = label;

@@ -58,7 +58,7 @@ const CENTER_Y = 225;
 const ZONES: Zone[] = [
   { id: 'queue', label: 'Queue', sublabel: 'Async', x: 140, y: 50, width: 200, height: 350 },
   { id: 'model', label: 'Model', sublabel: 'Replicas', x: 390, y: 50, width: 220, height: 350 },
-  { id: 'webhook', label: 'Webhook', x: 680, y: 50, width: 130, height: 350 },
+  { id: 'results', label: 'Results', sublabel: 'Via webhook', x: 680, y: 50, width: 130, height: 350 },
 ];
 
 /**
